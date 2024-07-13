@@ -5,8 +5,9 @@ import (
 
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/otellogger"
-	"github.com/s4mukka/justinject/internal/otellogrus"
+	"github.com/s4mukka/justinject/internal/otellogrusdecorator"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
 func Init(ctx *context.Context) *log.Entry {
@@ -29,7 +30,7 @@ func Init(ctx *context.Context) *log.Entry {
 func AddOtelHook(ctx *context.Context) {
 	environment := (*ctx).Value("environment").(*domain.Environment)
 
-	otelHook := otellogrus.NewHook(
+	otelHook := otellogrusdecorator.NewDecoratedHook(
 		environment.Instance,
 		otellogrus.WithLoggerProvider(environment.LoggerProvider),
 		otellogrus.WithLevels([]log.Level{
