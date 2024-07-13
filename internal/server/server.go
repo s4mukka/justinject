@@ -14,19 +14,18 @@ type Server struct {
 	Ctx *context.Context
 }
 
-func (s *Server) Init(intializeRoutes func(router *gin.Engine), port int) {
+func (s *Server) Init(intializeRoutes func(router *gin.Engine), port int) error {
 	environment := (*s.Ctx).Value("environment").(*domain.Environment)
 	logger := environment.Logger
 
 	gin.SetMode(os.Getenv("LOG_LEVEL"))
 	router := gin.New()
 
-	router.Use(gin.LoggerWithWriter(logger.Writer()))
 	router.Use(otelgin.Middleware(environment.Instance))
 
 	intializeRoutes(router)
 
 	logger.Infof("Listening and serving HTTP on :%d", port)
 
-	router.Run(fmt.Sprintf(":%d", port))
+	return router.Run(fmt.Sprintf(":%d", port))
 }

@@ -4,44 +4,42 @@ import (
 	"context"
 
 	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/otel"
 	"github.com/s4mukka/justinject/internal/otellogger"
-	"github.com/sirupsen/logrus"
+	"github.com/s4mukka/justinject/internal/otellogrus"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/bridges/otellogrus"
-	sdklog "go.opentelemetry.io/otel/sdk/log"
 )
 
-func Init(ctx *context.Context) (*log.Entry, *sdklog.LoggerProvider) {
+func Init(ctx *context.Context) *log.Entry {
 	environment := (*ctx).Value("environment").(*domain.Environment)
 	logger := log.New()
 	logger.SetFormatter(
 		otellogger.OTELLogger{
-			Formatter: log.JSONFormatter{},
+			Formatter: log.JSONFormatter{
+				FieldMap: log.FieldMap{
+					log.FieldKeyLevel: "severity_text",
+				},
+			},
 		},
 	)
-	logger.SetLevel(log.DebugLevel)
+	logger.WriterLevel(log.DebugLevel)
 
-	lp, err := otel.InitLogger(ctx)
-	if err != nil {
-		logger.Warnf("Error initializing logger: %v", err)
-	} else {
-		lp.Logger(environment.Instance)
-	}
+	return logger.WithField("instance", environment.Instance).WithField("teste", "testee")
+}
+
+func AddOtelHook(ctx *context.Context) {
+	environment := (*ctx).Value("environment").(*domain.Environment)
 
 	otelHook := otellogrus.NewHook(
 		environment.Instance,
-		otellogrus.WithLoggerProvider(lp),
+		otellogrus.WithLoggerProvider(environment.LoggerProvider),
 		otellogrus.WithLevels([]log.Level{
-			logrus.PanicLevel,
-			logrus.FatalLevel,
-			logrus.ErrorLevel,
-			logrus.WarnLevel,
-			logrus.InfoLevel,
+			log.PanicLevel,
+			log.FatalLevel,
+			log.ErrorLevel,
+			log.WarnLevel,
+			log.InfoLevel,
 		}),
 	)
 
-	logger.AddHook(otelHook)
-
-	return logger.WithField("instance", environment.Instance), lp
+	environment.Logger.Logger.AddHook(otelHook)
 }

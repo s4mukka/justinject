@@ -7,6 +7,7 @@ import (
 
 	"github.com/s4mukka/justinject/domain"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
+	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
 	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -30,8 +31,11 @@ func InitLogger(ctx *context.Context) (*sdklog.LoggerProvider, error) {
 		return nil, fmt.Errorf("Error creating OTLP exporter: %v\n", err)
 	}
 
+	stdoutExporter, _ := stdoutlog.New(stdoutlog.WithPrettyPrint())
+
 	lp := sdklog.NewLoggerProvider(
 		sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
+		sdklog.WithProcessor(sdklog.NewBatchProcessor(stdoutExporter)),
 		sdklog.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
 			semconv.ServiceNameKey.String(environment.Instance),
