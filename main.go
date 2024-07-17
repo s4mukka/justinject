@@ -1,13 +1,48 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"os"
+
 	"github.com/s4mukka/justinject/broker"
+	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/cli"
+	internalCtx "github.com/s4mukka/justinject/internal/context"
 	"github.com/spf13/cobra"
 )
 
-func main() {
-	rootCmd := &cobra.Command{}
-	rootCmd.AddCommand(broker.Init())
+var (
+	brokerInit                 = broker.Init
+	cliFactory cli.ICliFactory = &cli.CliFactory{}
+)
 
-	rootCmd.Execute()
+func main() {
+	rootCmd := cliFactory.MakeCli()
+	rootCmd.AddCommand(BuildCmd("broker", brokerInit))
+
+	fmt.Errorf("oi\n")
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error starting CLI: %v\n", err)
+	}
+}
+
+type Cmd func(ctx context.Context) error
+
+func BuildCmd(command string, fn Cmd) *cobra.Command {
+	return &cobra.Command{
+		Use:   command,
+		Short: fmt.Sprintf("Starting %s", command),
+		Run: func(cmd *cobra.Command, args []string) {
+			ctx := internalCtx.InitializeContext(command)
+			defer internalCtx.ShutdownComponents(ctx)
+			environment := ctx.Value("environment").(*domain.Environment)
+			logger := environment.Logger
+			logger.Infof("Starting %s...", command)
+			if err := fn(ctx); err != nil {
+				logger.Errorf("Error starting %s: %v\n", command, err)
+			}
+		},
+	}
 }

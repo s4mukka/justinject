@@ -1,5 +1,6 @@
 export LOG_LEVEL=release
 PROJECT_NAME=justinject
+EXCLUDES_COVERAGE=domain|mock
 
 build: clean
 	@ printf "Building application... "
@@ -17,7 +18,7 @@ build-alpine: clean
 
 clean: ## Builds binary
 	@ printf "Cleaning application... "
-	@ rm -f ${PROJECT_NAME}
+	@ rm -rf ${PROJECT_NAME} coverage
 	@ echo "done"
 
 run: build
@@ -39,3 +40,18 @@ down:
 	@ printf "Stopping compose... "
 	@ docker compose down
 	@ echo "done"
+
+test: clean
+	@ printf "Running tests... "
+	@ mkdir -p coverage
+	@ go test ./... -coverprofile=coverage/cover.out.tmp | grep -Ev "${EXCLUDES_COVERAGE}"
+	@ cat coverage/cover.out.tmp | grep -Ev "${EXCLUDES_COVERAGE}" > coverage/cover.out
+	@ rm -f coverage/cover.out.tmp
+	@	cat coverage/cover.out | \
+			awk 'BEGIN {cov=0; stat=0;} \
+			$$3!="" { cov+=($$3==1?$$2:0); stat+=$$2; } \
+			END {printf("Total coverage: %.2f%% of statements\n", (cov/stat)*100);}'
+	@ echo "done"
+
+coverage: test
+	@ go tool cover -html coverage/cover.out

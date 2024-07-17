@@ -11,11 +11,43 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
-func InitTracer(ctx *context.Context) (*sdktrace.TracerProvider, error) {
+type TracerProvider struct {
+	handler domain.IOtelTracerProvider
+}
+
+func (t TracerProvider) Get() domain.IOtelTracerProvider {
+	return t.handler
+}
+
+func (t TracerProvider) Tracer(name string, opts ...trace.TracerOption) trace.Tracer {
+	return t.handler.Tracer(name, opts...)
+}
+
+func (t TracerProvider) RegisterSpanProcessor(sp sdktrace.SpanProcessor) {
+	t.handler.RegisterSpanProcessor(sp)
+}
+
+func (t TracerProvider) UnregisterSpanProcessor(sp sdktrace.SpanProcessor) {
+	t.handler.UnregisterSpanProcessor(sp)
+}
+
+func (t TracerProvider) ForceFlush(ctx context.Context) error {
+	return t.handler.ForceFlush(ctx)
+}
+
+func (t TracerProvider) Shutdown(ctx context.Context) error {
+	return t.handler.Shutdown(ctx)
+}
+
+var (
+	otlptracegrpcNew = otlptracegrpc.New
+)
+
+func InitTracer(ctx *context.Context) (domain.ITracerProvider, error) {
 	environment := (*ctx).Value("environment").(*domain.Environment)
-	// logger := environment.Logger
 
 	var otelEndpoint string
 
@@ -23,7 +55,7 @@ func InitTracer(ctx *context.Context) (*sdktrace.TracerProvider, error) {
 		return nil, fmt.Errorf("OTEL_ENDPOINT_GRPC environment variable is not defined")
 	}
 
-	exporter, err := otlptracegrpc.New(*ctx,
+	exporter, err := otlptracegrpcNew(*ctx,
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithEndpoint(otelEndpoint),
 	)
@@ -39,6 +71,10 @@ func InitTracer(ctx *context.Context) (*sdktrace.TracerProvider, error) {
 		)),
 	)
 
-	otel.SetTracerProvider(tp)
-	return tp, nil
+	fmt.Printf("%+v", tp)
+
+	tracerProvider := TracerProvider{handler: tp}
+
+	otel.SetTracerProvider(tracerProvider.Get())
+	return tracerProvider, nil
 }

@@ -5,22 +5,25 @@ import (
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
-type DecoratedHook struct {
-	hook *otellogrus.Hook
+type Hook interface {
+	Levels() []logrus.Level
+	Fire(entry *logrus.Entry) error
 }
 
-func NewDecoratedHook(name string, options ...otellogrus.Option) *DecoratedHook {
+type DecoratedHook struct {
+	hook Hook
+}
+
+func NewDecoratedHook(name string, options ...otellogrus.Option) Hook {
 	return &DecoratedHook{
 		hook: otellogrus.NewHook(name, options...),
 	}
 }
 
-// Levels returns the list of log levels we want to be sent to OpenTelemetry.
 func (h *DecoratedHook) Levels() []logrus.Level {
 	return h.hook.Levels()
 }
 
-// Fire handles the passed record, and sends it to OpenTelemetry.
 func (h *DecoratedHook) Fire(entry *logrus.Entry) error {
 	entry.Data["level"] = convertLogLevel(entry.Level)
 	h.hook.Fire(entry)

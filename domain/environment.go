@@ -1,16 +1,21 @@
 package domain
 
 import (
+	"context"
+
 	log "github.com/sirupsen/logrus"
-	sdklog "go.opentelemetry.io/otel/sdk/log"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
+
+type ILogger interface {
+	log.FieldLogger
+	WithContext(ctx context.Context) *log.Entry
+}
 
 type Environment struct {
 	Instance string
 
-	Logger *log.Entry
+	Logger ILogger
 
-	LoggerProvider *sdklog.LoggerProvider
-	TracerProvider *sdktrace.TracerProvider
+	LoggerProvider ILoggerProvider
+	TracerProvider ITracerProvider
 }

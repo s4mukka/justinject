@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+	"os"
 
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/otellogger"
@@ -10,9 +11,14 @@ import (
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
+var (
+	newHook = otellogrusdecorator.NewDecoratedHook
+)
+
 func Init(ctx *context.Context) *log.Entry {
 	environment := (*ctx).Value("environment").(*domain.Environment)
 	logger := log.New()
+	logger.SetOutput(os.Stdout)
 	logger.SetFormatter(
 		otellogger.OTELLogger{
 			Formatter: log.JSONFormatter{
@@ -24,15 +30,15 @@ func Init(ctx *context.Context) *log.Entry {
 	)
 	logger.WriterLevel(log.DebugLevel)
 
-	return logger.WithField("instance", environment.Instance).WithField("teste", "testee")
+	return logger.WithField("instance", environment.Instance)
 }
 
 func AddOtelHook(ctx *context.Context) {
 	environment := (*ctx).Value("environment").(*domain.Environment)
 
-	otelHook := otellogrusdecorator.NewDecoratedHook(
+	otelHook := newHook(
 		environment.Instance,
-		otellogrus.WithLoggerProvider(environment.LoggerProvider),
+		otellogrus.WithLoggerProvider(environment.LoggerProvider.Get()),
 		otellogrus.WithLevels([]log.Level{
 			log.PanicLevel,
 			log.FatalLevel,
@@ -42,5 +48,5 @@ func AddOtelHook(ctx *context.Context) {
 		}),
 	)
 
-	environment.Logger.Logger.AddHook(otelHook)
+	environment.Logger.(*log.Entry).Logger.AddHook(otelHook)
 }
