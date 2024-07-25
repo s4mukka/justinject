@@ -14,7 +14,7 @@ func TestInitializeTracerProviderSuccess(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	mockedTracerProvider := &mocks.MockedTracerProvider{}
 	mockedTracerProvider.On("Tracer", "test-instance").Return(&mocks.MockedOtelTracer{})
@@ -36,7 +36,7 @@ func TestInitializeTracerProviderFailure(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	otelInitTracer = func(ctx domain.IContext) (domain.ITracerProvider, error) {
 		return nil, errors.New("simulated error")

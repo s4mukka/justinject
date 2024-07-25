@@ -18,7 +18,7 @@ type Server struct {
 }
 
 func (s *Server) Init(intializeRoutes func(router domain.IRouter), port int) error {
-	environment := s.Ctx.Value("environment").(*domain.Environment)
+	environment := s.Ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	logger := environment.Logger
 
 	gin.SetMode(os.Getenv("LOG_LEVEL"))

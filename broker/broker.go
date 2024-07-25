@@ -17,7 +17,7 @@ var (
 )
 
 func Init(ctx context.Context) error {
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	logger = environment.Logger
 	svr := serverFactory.MakeServer(ctx)
 	return svr.Init(intializeRoutes, port)

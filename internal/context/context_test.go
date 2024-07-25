@@ -22,7 +22,7 @@ func TestInitializeContext(t *testing.T) {
 
 	ctx := InitializeContext(instance)
 
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	assert.NotNil(t, environment)
 	assert.Equal(t, instance, environment.Instance)
 	assert.NotNil(t, environment.Logger)
@@ -73,7 +73,7 @@ func TestShutdownComponents(t *testing.T) {
 	addOtelHook = func(ctx domain.IContext) {}
 
 	ctx := InitializeContext(instance)
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 
 	mockLoggerProvider := environment.LoggerProvider.(*mocks.MockedLoggerProvider)
 	mockTracerProvider := environment.TracerProvider.(*mocks.MockedTracerProvider)
@@ -119,7 +119,7 @@ func TestShutdownComponentsWithError(t *testing.T) {
 		[]interface{}{mockError},
 	)
 	ctx := InitializeContext(instance)
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 
 	mockLoggerProvider := environment.LoggerProvider.(*mocks.MockedLoggerProvider)
 	mockTracerProvider := environment.TracerProvider.(*mocks.MockedTracerProvider)

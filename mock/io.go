@@ -2,7 +2,6 @@ package mock
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 )
@@ -16,9 +15,11 @@ func CaptureError(fn func()) string {
 
 	w.Close()
 	var buf bytes.Buffer
-	io.Copy(&buf, r)
+	_, err := io.Copy(&buf, r)
+	if err != nil {
+		panic(err)
+	}
 	os.Stderr = old
-	fmt.Printf("ERR %v\n", buf)
 	return buf.String()
 }
 
@@ -31,8 +32,10 @@ func CaptureOutput(fn func()) string {
 
 	w.Close()
 	var buf bytes.Buffer
-	io.Copy(&buf, r)
+	_, err := io.Copy(&buf, r)
+	if err != nil {
+		panic(err)
+	}
 	os.Stdout = old
-	fmt.Printf("OUT %v\n", buf)
 	return buf.String()
 }

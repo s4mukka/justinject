@@ -15,7 +15,7 @@ func TestInit(t *testing.T) {
 	environment := &domain.Environment{
 		Logger: logrus.NewEntry(logrus.New()),
 	}
-	ctx = context.WithValue(ctx, "environment", environment)
+	ctx = context.WithValue(ctx, domain.EnvironmentKey, environment)
 
 	serverFactory = &mocks.MockServerFactory{}
 

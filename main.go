@@ -35,7 +35,7 @@ func BuildCmd(command string, fn Cmd) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := internalCtx.InitializeContext(command)
 			defer internalCtx.ShutdownComponents(ctx)
-			environment := ctx.Value("environment").(*domain.Environment)
+			environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 			logger := environment.Logger
 			logger.Infof("Starting %s...", command)
 			if err := fn(ctx); err != nil {

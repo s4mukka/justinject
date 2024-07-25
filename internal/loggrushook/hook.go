@@ -22,8 +22,7 @@ func (h *OtelLoggrusHook) Levels() []logrus.Level {
 
 func (h *OtelLoggrusHook) Fire(entry *logrus.Entry) error {
 	entry.Data["level"] = convertLogLevel(entry.Level)
-	h.hook.Fire(entry)
-	return nil
+	return h.hook.Fire(entry)
 }
 
 func convertLogLevel(level logrus.Level) string {
