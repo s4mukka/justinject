@@ -34,8 +34,8 @@ var (
 	otlploghttpNew = otlploghttp.New
 )
 
-func InitLogger(ctx *context.Context) (domain.ILoggerProvider, error) {
-	environment := (*ctx).Value("environment").(*domain.Environment)
+func InitLogger(ctx domain.IContext) (domain.ILoggerProvider, error) {
+	environment := ctx.Value("environment").(*domain.Environment)
 
 	var otelEndpoint string
 
@@ -43,7 +43,7 @@ func InitLogger(ctx *context.Context) (domain.ILoggerProvider, error) {
 		return nil, fmt.Errorf("OTEL_ENDPOINT_HTTP environment variable is not defined")
 	}
 
-	exporter, err := otlploghttpNew(*ctx,
+	exporter, err := otlploghttpNew(ctx,
 		otlploghttp.WithInsecure(),
 		otlploghttp.WithEndpoint(otelEndpoint),
 	)

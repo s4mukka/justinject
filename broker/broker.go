@@ -13,12 +13,12 @@ const (
 
 var (
 	logger        domain.ILogger
-	serverFactory server.IServerFactory = &server.ServerFactory{}
+	serverFactory domain.IServerFactory = &server.ServerFactory{}
 )
 
 func Init(ctx context.Context) error {
 	environment := ctx.Value("environment").(*domain.Environment)
 	logger = environment.Logger
-	svr := serverFactory.MakeServer(&ctx)
+	svr := serverFactory.MakeServer(ctx)
 	return svr.Init(intializeRoutes, port)
 }

@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"github.com/s4mukka/justinject/domain"
-	"github.com/sirupsen/logrus"
 )
 
 func CaptureError(fn func()) string {
@@ -37,14 +34,5 @@ func CaptureOutput(fn func()) string {
 	io.Copy(&buf, r)
 	os.Stdout = old
 	fmt.Printf("OUT %v\n", buf)
-	return buf.String()
-}
-
-func CaptureLoggerOutput(logger domain.ILogger, fn func()) string {
-	old := logger.(*logrus.Entry).Logger.Out
-	buf := bytes.Buffer{}
-	logger.(*logrus.Entry).Logger.SetOutput(&buf)
-	fn()
-	logger.(*logrus.Entry).Logger.SetOutput(old)
 	return buf.String()
 }

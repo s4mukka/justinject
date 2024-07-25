@@ -13,15 +13,13 @@ import (
 )
 
 var (
-	brokerInit                 = broker.Init
-	cliFactory cli.ICliFactory = &cli.CliFactory{}
+	brokerInit                    = broker.Init
+	cliFactory domain.ICliFactory = &cli.CliFactory{}
 )
 
 func main() {
 	rootCmd := cliFactory.MakeCli()
 	rootCmd.AddCommand(BuildCmd("broker", brokerInit))
-
-	fmt.Errorf("oi\n")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error starting CLI: %v\n", err)

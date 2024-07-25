@@ -6,32 +6,9 @@ import (
 	"testing"
 
 	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/context/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-type MockedTracerProvider struct {
-	mock.Mock
-}
-
-func (m *MockedTracerProvider) Get() domain.IOtelTracerProvider {
-	return nil
-}
-
-func (m *MockedTracerProvider) Tracer(name string, opts ...domain.OtelTracerOption) domain.OtelTracer {
-	args := m.Called(name)
-	return args.Get(0).(domain.OtelTracer)
-}
-
-func (m *MockedTracerProvider) Shutdown(ctx context.Context) error {
-	args := m.Called(ctx)
-	return args.Error(0)
-}
-
-type MockedOtelTracer struct {
-	domain.OtelTracer
-	mock.Mock
-}
 
 func TestInitializeTracerProviderSuccess(t *testing.T) {
 	environment := &domain.Environment{
@@ -39,10 +16,10 @@ func TestInitializeTracerProviderSuccess(t *testing.T) {
 	}
 	ctx := context.WithValue(context.Background(), "environment", environment)
 
-	mockedTracerProvider := &MockedTracerProvider{}
-	mockedTracerProvider.On("Tracer", "test-instance").Return(&MockedOtelTracer{})
+	mockedTracerProvider := &mocks.MockedTracerProvider{}
+	mockedTracerProvider.On("Tracer", "test-instance").Return(&mocks.MockedOtelTracer{})
 
-	otelInitTracer = func(ctx *context.Context) (domain.ITracerProvider, error) {
+	otelInitTracer = func(ctx domain.IContext) (domain.ITracerProvider, error) {
 		return mockedTracerProvider, nil
 	}
 
@@ -61,7 +38,7 @@ func TestInitializeTracerProviderFailure(t *testing.T) {
 	}
 	ctx := context.WithValue(context.Background(), "environment", environment)
 
-	otelInitTracer = func(ctx *context.Context) (domain.ITracerProvider, error) {
+	otelInitTracer = func(ctx domain.IContext) (domain.ITracerProvider, error) {
 		return nil, errors.New("simulated error")
 	}
 

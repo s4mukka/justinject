@@ -11,17 +11,20 @@ import (
 	traceembedded "go.opentelemetry.io/otel/trace/embedded"
 )
 
-type IOtelLoggerProvider interface {
-	logembedded.LoggerProvider
-	ForceFlush(ctx context.Context) error
-	Logger(name string, opts ...OtelLoggerOption) OtelLogger
-	Shutdown(ctx context.Context) error
-}
-
 type OtelLoggerProvider = *sdklog.LoggerProvider
 type OtelLoggerOption = log.LoggerOption
 type OtelLogger = log.Logger
 type OtelRecord = log.Record
+
+type OtelTracerProvider = *sdktrace.TracerProvider
+type OtelTracerOption = trace.TracerOption
+type OtelTracer = trace.Tracer
+
+type IOtelLoggerProvider interface {
+	logembedded.LoggerProvider
+	Logger(name string, opts ...OtelLoggerOption) OtelLogger
+	Shutdown(ctx context.Context) error
+}
 
 type ILoggerProvider interface {
 	Get() IOtelLoggerProvider
@@ -30,21 +33,14 @@ type ILoggerProvider interface {
 }
 
 type ILoggerProviderFactory interface {
-	InitializeLoggerProvider(ctx context.Context) (ILoggerProvider, error)
+	InitializeLoggerProvider(ctx IContext) (ILoggerProvider, error)
 }
 
 type IOtelTracerProvider interface {
 	traceembedded.TracerProvider
-	RegisterSpanProcessor(sp sdktrace.SpanProcessor)
-	UnregisterSpanProcessor(sp sdktrace.SpanProcessor)
-	ForceFlush(ctx context.Context) error
 	Tracer(name string, opts ...trace.TracerOption) trace.Tracer
 	Shutdown(ctx context.Context) error
 }
-
-type OtelTracerProvider = *sdktrace.TracerProvider
-type OtelTracerOption = trace.TracerOption
-type OtelTracer = trace.Tracer
 
 type ITracerProvider interface {
 	Get() IOtelTracerProvider
@@ -53,5 +49,5 @@ type ITracerProvider interface {
 }
 
 type ITracerProviderFactory interface {
-	InitializeTracerProvider(ctx context.Context) (ITracerProvider, error)
+	InitializeTracerProvider(ctx IContext) (ITracerProvider, error)
 }

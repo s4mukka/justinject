@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -10,25 +9,16 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
-type IServer interface {
-	Init(intializeRoutes func(router IRouter), port int) error
-}
-type Server struct {
-	Ctx *context.Context
-}
-
-type IRouter interface {
-	gin.IRoutes
-	Use(middleware ...gin.HandlerFunc) gin.IRoutes
-	Run(addr ...string) (err error)
-}
-
 var (
-	router IRouter = gin.New()
+	router domain.IRouter = gin.New()
 )
 
-func (s *Server) Init(intializeRoutes func(router IRouter), port int) error {
-	environment := (*s.Ctx).Value("environment").(*domain.Environment)
+type Server struct {
+	Ctx domain.IContext
+}
+
+func (s *Server) Init(intializeRoutes func(router domain.IRouter), port int) error {
+	environment := s.Ctx.Value("environment").(*domain.Environment)
 	logger := environment.Logger
 
 	gin.SetMode(os.Getenv("LOG_LEVEL"))
@@ -42,12 +32,8 @@ func (s *Server) Init(intializeRoutes func(router IRouter), port int) error {
 	return router.Run(fmt.Sprintf(":%d", port))
 }
 
-type IServerFactory interface {
-	MakeServer(ctx *context.Context) IServer
-}
-
 type ServerFactory struct{}
 
-func (sf *ServerFactory) MakeServer(ctx *context.Context) IServer {
+func (sf *ServerFactory) MakeServer(ctx domain.IContext) domain.IServer {
 	return &Server{Ctx: ctx}
 }

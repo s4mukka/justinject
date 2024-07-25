@@ -2,8 +2,6 @@ package context
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 
 	"github.com/s4mukka/justinject/domain"
 	log "github.com/s4mukka/justinject/internal/logging"
@@ -13,13 +11,14 @@ var (
 	loggerProviderFactory domain.ILoggerProviderFactory = LoggerProviderFactory{}
 	tracerProviderFactory domain.ITracerProviderFactory = TracerProviderFactory{}
 	addOtelHook                                         = log.AddOtelHook
+	logInit                                             = log.Init
 )
 
-func InitializeContext(instance string) context.Context {
+func InitializeContext(instance string) domain.IContext {
 	environment := domain.Environment{Instance: instance}
 	ctx := context.WithValue(context.Background(), "environment", &environment)
 
-	logger := log.Init(&ctx)
+	logger := logInit(ctx)
 	environment.Logger = logger
 
 	loggerProvider, err := loggerProviderFactory.InitializeLoggerProvider(ctx)
@@ -27,7 +26,7 @@ func InitializeContext(instance string) context.Context {
 		logger.Warnf("Error initializing logger: %v\n", err)
 	} else {
 		environment.LoggerProvider = loggerProvider
-		addOtelHook(&ctx)
+		addOtelHook(ctx)
 	}
 
 	tracerProvider, err := tracerProviderFactory.InitializeTracerProvider(ctx)
@@ -39,7 +38,7 @@ func InitializeContext(instance string) context.Context {
 	return ctx
 }
 
-func ShutdownComponents(ctx context.Context) {
+func ShutdownComponents(ctx domain.IContext) {
 	if ctx == nil {
 		return
 	}
@@ -49,15 +48,14 @@ func ShutdownComponents(ctx context.Context) {
 	loggerProvider := environment.LoggerProvider
 	if loggerProvider != nil {
 		if err := loggerProvider.Shutdown(context.Background()); err != nil {
-			fmt.Printf("SHUT %p %v", &environment.Logger, reflect.TypeOf(logger))
-			logger.Warnf("Error closing logger: %v", err)
+			logger.Warnf("Error closing logger: %v\n", err)
 		}
 	}
 
 	tracerProvider := environment.TracerProvider
 	if tracerProvider != nil {
 		if err := tracerProvider.Shutdown(context.Background()); err != nil {
-			logger.Warnf("Error closing tracer: %v", err)
+			logger.Warnf("Error closing tracer: %v\n", err)
 		}
 	}
 }

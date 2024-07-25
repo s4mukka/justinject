@@ -1,30 +1,26 @@
-package otellogrusdecorator
+package loggrushook
 
 import (
+	"github.com/s4mukka/justinject/domain"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
-type Hook interface {
-	Levels() []logrus.Level
-	Fire(entry *logrus.Entry) error
+type OtelLoggrusHook struct {
+	hook domain.IHook
 }
 
-type DecoratedHook struct {
-	hook Hook
-}
-
-func NewDecoratedHook(name string, options ...otellogrus.Option) Hook {
-	return &DecoratedHook{
+func NewOtelLoggrusHook(name string, options ...otellogrus.Option) domain.IHook {
+	return &OtelLoggrusHook{
 		hook: otellogrus.NewHook(name, options...),
 	}
 }
 
-func (h *DecoratedHook) Levels() []logrus.Level {
+func (h *OtelLoggrusHook) Levels() []logrus.Level {
 	return h.hook.Levels()
 }
 
-func (h *DecoratedHook) Fire(entry *logrus.Entry) error {
+func (h *OtelLoggrusHook) Fire(entry *logrus.Entry) error {
 	entry.Data["level"] = convertLogLevel(entry.Level)
 	h.hook.Fire(entry)
 	return nil

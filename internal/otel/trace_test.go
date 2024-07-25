@@ -7,14 +7,12 @@ import (
 	"testing"
 
 	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/otel/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/log"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
-	"go.opentelemetry.io/otel/trace/embedded"
 )
 
 func TestInitTracer_Success(t *testing.T) {
@@ -26,7 +24,7 @@ func TestInitTracer_Success(t *testing.T) {
 	os.Setenv("OTEL_ENDPOINT_GRPC", "localhost:4318")
 	defer os.Unsetenv("OTEL_ENDPOINT_GRPC")
 
-	tracerProvider, err := InitTracer(&ctx)
+	tracerProvider, err := InitTracer(ctx)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, tracerProvider)
@@ -43,7 +41,7 @@ func TestInitTracer_NoOtelEndpoint(t *testing.T) {
 
 	os.Unsetenv("OTEL_ENDPOINT_GRPC")
 
-	tracerProvider, err := InitTracer(&ctx)
+	tracerProvider, err := InitTracer(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, tracerProvider)
@@ -65,7 +63,7 @@ func TestInitTracer_ExporterError(t *testing.T) {
 		return nil, fmt.Errorf("mock exporter creation error")
 	}
 
-	tracerProvider, err := InitTracer(&ctx)
+	tracerProvider, err := InitTracer(ctx)
 
 	assert.Error(t, err)
 	assert.Nil(t, tracerProvider)
@@ -73,71 +71,24 @@ func TestInitTracer_ExporterError(t *testing.T) {
 }
 
 func TestTracerProvider_Get(t *testing.T) {
-	mockProvider := new(domain.OtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: *mockProvider}
+	provider := new(domain.OtelTracerProvider)
+	tracerProvider := &TracerProvider{handler: *provider}
 
 	result := tracerProvider.Get()
 
-	assert.Equal(t, *mockProvider, result)
-}
-
-type MockOtelTracerProvider struct {
-	embedded.TracerProvider
-	mock.Mock
-}
-
-func (m *MockOtelTracerProvider) Tracer(name string, opts ...trace.TracerOption) trace.Tracer {
-	args := m.Called(name, opts)
-	return args.Get(0).(trace.Tracer)
-}
-
-func (m *MockOtelTracerProvider) ForceFlush(ctx context.Context) error {
-	args := m.Called(ctx)
-	return args.Error(0)
-}
-
-func (m *MockOtelTracerProvider) Shutdown(ctx context.Context) error {
-	args := m.Called(ctx)
-	return args.Error(0)
-}
-
-func (m *MockOtelTracerProvider) RegisterSpanProcessor(sp sdktrace.SpanProcessor) {
-	m.Called(sp)
-}
-
-func (m *MockOtelTracerProvider) UnregisterSpanProcessor(sp sdktrace.SpanProcessor) {
-	m.Called(sp)
-}
-
-type MockTracer struct {
-	embedded.Tracer
-	mock.Mock
-}
-
-func (m *MockTracer) Emit(ctx context.Context, record log.Record) {
-	m.Called(ctx, record)
-}
-
-func (m *MockTracer) Start(ctx context.Context, spanName string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
-	args := m.Called(ctx, spanName, opts)
-	return args.Get(0).(context.Context), args.Get(1).(trace.Span)
-}
-
-func (m *MockTracer) Enabled(ctx context.Context, record log.Record) bool {
-	args := m.Called(ctx, record)
-	return args.Bool(0)
+	assert.Equal(t, *provider, result)
 }
 
 func TestTracerProvider_Tracer(t *testing.T) {
-	mockProvider := new(MockOtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: mockProvider}
-	mockTracer := new(MockTracer)
-	mockProvider.On("Tracer", "test", mock.Anything).Return(mockTracer)
+	provider := new(mocks.MockOtelTracerProvider)
+	tracerProvider := &TracerProvider{handler: provider}
+	tracer := new(mocks.MockTracer)
+	provider.On("Tracer", "test", mock.Anything).Return(tracer)
 
 	result := tracerProvider.Tracer("test")
 
-	assert.Equal(t, mockTracer, result)
-	mockProvider.AssertCalled(t, "Tracer", "test", mock.Anything)
+	assert.Equal(t, tracer, result)
+	provider.AssertCalled(t, "Tracer", "test", mock.Anything)
 }
 
 type MockSpanProcessor struct {
@@ -162,48 +113,13 @@ func (m *MockSpanProcessor) ForceFlush(ctx context.Context) error {
 	return args.Error(0)
 }
 
-func TestTracerProvider_RegisterSpanProcessor(t *testing.T) {
-	mockProcessor := new(MockSpanProcessor)
-	mockProvider := new(MockOtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: mockProvider}
-
-	mockProvider.On("RegisterSpanProcessor", mockProcessor)
-
-	tracerProvider.RegisterSpanProcessor(mockProcessor)
-
-	mockProvider.AssertCalled(t, "RegisterSpanProcessor", mockProcessor)
-}
-
-func TestTracerProvider_UnregisterSpanProcessor(t *testing.T) {
-	mockProcessor := new(MockSpanProcessor)
-	mockProvider := new(MockOtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: mockProvider}
-
-	mockProvider.On("UnregisterSpanProcessor", mockProcessor)
-
-	tracerProvider.UnregisterSpanProcessor(mockProcessor)
-
-	mockProvider.AssertCalled(t, "UnregisterSpanProcessor", mockProcessor)
-}
-
-func TestTracerProvider_ForceFlush(t *testing.T) {
-	mockProvider := new(MockOtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: mockProvider}
-	mockProvider.On("ForceFlush", mock.Anything).Return(nil)
-
-	err := tracerProvider.ForceFlush(context.Background())
-
-	assert.NoError(t, err)
-	mockProvider.AssertCalled(t, "ForceFlush", mock.Anything)
-}
-
 func TestTracerProvider_Shutdown(t *testing.T) {
-	mockProvider := new(MockOtelTracerProvider)
-	tracerProvider := &TracerProvider{handler: mockProvider}
-	mockProvider.On("Shutdown", mock.Anything).Return(nil)
+	provider := new(mocks.MockOtelTracerProvider)
+	tracerProvider := &TracerProvider{handler: provider}
+	provider.On("Shutdown", mock.Anything).Return(nil)
 
 	err := tracerProvider.Shutdown(context.Background())
 
 	assert.NoError(t, err)
-	mockProvider.AssertCalled(t, "Shutdown", mock.Anything)
+	provider.AssertCalled(t, "Shutdown", mock.Anything)
 }

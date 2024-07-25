@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/s4mukka/justinject/domain"
-	m "github.com/s4mukka/justinject/mock"
+	"github.com/s4mukka/justinject/internal/context/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -22,10 +22,10 @@ func TestInitializeLoggerProviderSuccess(t *testing.T) {
 	}
 	ctx := context.WithValue(context.Background(), "environment", environment)
 
-	mockedLoggerProvider := &m.MockedLoggerProvider{}
+	mockedLoggerProvider := &mocks.MockedLoggerProvider{}
 	mockedLoggerProvider.On("Logger", "test-instance").Return(&MockedOtelLogger{})
 
-	otelInitLogger = func(ctx *context.Context) (domain.ILoggerProvider, error) {
+	otelInitLogger = func(ctx domain.IContext) (domain.ILoggerProvider, error) {
 		return mockedLoggerProvider, nil
 	}
 
@@ -44,7 +44,7 @@ func TestInitializeLoggerProviderFailure(t *testing.T) {
 	}
 	ctx := context.WithValue(context.Background(), "environment", environment)
 
-	otelInitLogger = func(ctx *context.Context) (domain.ILoggerProvider, error) {
+	otelInitLogger = func(ctx domain.IContext) (domain.ILoggerProvider, error) {
 		return nil, errors.New("simulated error")
 	}
 

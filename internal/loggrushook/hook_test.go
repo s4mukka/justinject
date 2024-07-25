@@ -1,46 +1,46 @@
-package otellogrusdecorator
+package loggrushook
 
 import (
 	"testing"
 
-	"github.com/s4mukka/justinject/mock"
+	"github.com/s4mukka/justinject/internal/loggrushook/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewDecoratedHook(t *testing.T) {
 	name := "test-hook"
-	hook := NewDecoratedHook(name)
+	hook := NewOtelLoggrusHook(name)
 	assert.NotNil(t, hook)
-	assert.IsType(t, &DecoratedHook{}, hook)
+	assert.IsType(t, &OtelLoggrusHook{}, hook)
 }
 
 func TestDecoratedHook_Levels(t *testing.T) {
-	mockHook := new(mock.MockedHook)
+	mockHook := new(mocks.MockedHook)
 	mockHook.On("Levels").Return([]logrus.Level{logrus.InfoLevel, logrus.WarnLevel})
-	decoratedHook := &DecoratedHook{
+	hook := &OtelLoggrusHook{
 		hook: mockHook,
 	}
 
-	levels := decoratedHook.Levels()
+	levels := hook.Levels()
 	assert.Equal(t, []logrus.Level{logrus.InfoLevel, logrus.WarnLevel}, levels)
 
 	mockHook.AssertCalled(t, "Levels")
 }
 
 func TestDecoratedHook_Fire(t *testing.T) {
-	mockHook := new(mock.MockedHook)
+	mockHook := new(mocks.MockedHook)
 	entry := &logrus.Entry{
 		Level: logrus.WarnLevel,
 		Data:  logrus.Fields{},
 	}
 	mockHook.On("Fire", entry).Return(nil)
 
-	decoratedHook := &DecoratedHook{
+	hook := &OtelLoggrusHook{
 		hook: mockHook,
 	}
 
-	err := decoratedHook.Fire(entry)
+	err := hook.Fire(entry)
 	assert.NoError(t, err)
 	assert.Equal(t, "warn", entry.Data["level"])
 

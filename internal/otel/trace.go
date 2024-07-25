@@ -26,18 +26,6 @@ func (t TracerProvider) Tracer(name string, opts ...trace.TracerOption) trace.Tr
 	return t.handler.Tracer(name, opts...)
 }
 
-func (t TracerProvider) RegisterSpanProcessor(sp sdktrace.SpanProcessor) {
-	t.handler.RegisterSpanProcessor(sp)
-}
-
-func (t TracerProvider) UnregisterSpanProcessor(sp sdktrace.SpanProcessor) {
-	t.handler.UnregisterSpanProcessor(sp)
-}
-
-func (t TracerProvider) ForceFlush(ctx context.Context) error {
-	return t.handler.ForceFlush(ctx)
-}
-
 func (t TracerProvider) Shutdown(ctx context.Context) error {
 	return t.handler.Shutdown(ctx)
 }
@@ -46,8 +34,8 @@ var (
 	otlptracegrpcNew = otlptracegrpc.New
 )
 
-func InitTracer(ctx *context.Context) (domain.ITracerProvider, error) {
-	environment := (*ctx).Value("environment").(*domain.Environment)
+func InitTracer(ctx domain.IContext) (domain.ITracerProvider, error) {
+	environment := ctx.Value("environment").(*domain.Environment)
 
 	var otelEndpoint string
 
@@ -55,7 +43,7 @@ func InitTracer(ctx *context.Context) (domain.ITracerProvider, error) {
 		return nil, fmt.Errorf("OTEL_ENDPOINT_GRPC environment variable is not defined")
 	}
 
-	exporter, err := otlptracegrpcNew(*ctx,
+	exporter, err := otlptracegrpcNew(ctx,
 		otlptracegrpc.WithInsecure(),
 		otlptracegrpc.WithEndpoint(otelEndpoint),
 	)
@@ -70,8 +58,6 @@ func InitTracer(ctx *context.Context) (domain.ITracerProvider, error) {
 			semconv.ServiceNameKey.String(environment.Instance),
 		)),
 	)
-
-	fmt.Printf("%+v", tp)
 
 	tracerProvider := TracerProvider{handler: tp}
 

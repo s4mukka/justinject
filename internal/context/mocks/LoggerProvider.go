@@ -1,10 +1,9 @@
-package mock
+package mocks
 
 import (
 	"context"
 
 	"github.com/s4mukka/justinject/domain"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -26,16 +25,16 @@ func (m *MockedLoggerProvider) Shutdown(ctx context.Context) error {
 	return args.Error(0)
 }
 
-type MockedHook struct {
-	mock.Mock
+type MockLoggerProviderFactory struct{}
+
+func (m MockLoggerProviderFactory) InitializeLoggerProvider(ctx domain.IContext) (domain.ILoggerProvider, error) {
+	return &MockedLoggerProvider{}, nil
 }
 
-func (m *MockedHook) Levels() []logrus.Level {
-	args := m.Called()
-	return args.Get(0).([]logrus.Level)
+type MockLoggerProviderFactoryWithError struct {
+	Error error
 }
 
-func (h *MockedHook) Fire(entry *logrus.Entry) error {
-	args := h.Called(entry)
-	return args.Error(0)
+func (m MockLoggerProviderFactoryWithError) InitializeLoggerProvider(ctx domain.IContext) (domain.ILoggerProvider, error) {
+	return nil, m.Error
 }

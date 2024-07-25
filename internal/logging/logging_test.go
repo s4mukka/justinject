@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/otellogrusdecorator"
-	"github.com/s4mukka/justinject/mock"
+	"github.com/s4mukka/justinject/internal/logging/mocks"
+	mocksHook "github.com/s4mukka/justinject/internal/loggrushook/mocks"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
@@ -19,14 +19,14 @@ func TestInit(t *testing.T) {
 
 	ctx := context.WithValue(context.Background(), "environment", environment)
 
-	logger := Init(&ctx)
+	logger := Init(ctx)
 
 	assert.NotNil(t, logger)
-	assert.Equal(t, "test-instance", logger.Data["instance"])
+	assert.Equal(t, "test-instance", logger.(*log.Entry).Data["instance"])
 }
 
 func TestAddOtelHook(t *testing.T) {
-	mockProvider := &mock.MockedLoggerProvider{}
+	mockProvider := &mocks.MockedLoggerProvider{}
 	mockProvider.On("Get").Return(new(domain.OtelLoggerProvider))
 
 	mockEnv := &domain.Environment{
@@ -37,14 +37,14 @@ func TestAddOtelHook(t *testing.T) {
 
 	ctx := context.WithValue(context.Background(), "environment", mockEnv)
 
-	originalNewHook := newHook
-	defer func() { newHook = originalNewHook }()
-	mockHook := new(mock.MockedHook)
-	newHook = func(instance string, opts ...otellogrus.Option) otellogrusdecorator.Hook {
-		return mockHook
+	originalNewHook := newOtelLoggrusHook
+	defer func() { newOtelLoggrusHook = originalNewHook }()
+	hook := new(mocksHook.MockedHook)
+	newOtelLoggrusHook = func(instance string, opts ...otellogrus.Option) domain.IHook {
+		return hook
 	}
 
-	mockHook.On("Levels").Return([]log.Level{
+	hook.On("Levels").Return([]log.Level{
 		log.PanicLevel,
 		log.FatalLevel,
 		log.ErrorLevel,
@@ -52,9 +52,9 @@ func TestAddOtelHook(t *testing.T) {
 		log.InfoLevel,
 	})
 
-	logger := Init(&ctx)
+	logger := Init(ctx)
 
-	AddOtelHook(&ctx)
+	AddOtelHook(ctx)
 
-	assert.NotNil(t, logger.Logger.Hooks)
+	assert.NotNil(t, logger.(*log.Entry).Logger.Hooks)
 }

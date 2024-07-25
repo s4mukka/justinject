@@ -1,8 +1,6 @@
 package context
 
 import (
-	"context"
-
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/otel"
 )
@@ -13,10 +11,10 @@ var (
 
 type LoggerProviderFactory struct{}
 
-func (l LoggerProviderFactory) InitializeLoggerProvider(ctx context.Context) (domain.ILoggerProvider, error) {
+func (l LoggerProviderFactory) InitializeLoggerProvider(ctx domain.IContext) (domain.ILoggerProvider, error) {
 	environment := ctx.Value("environment").(*domain.Environment)
 
-	loggerProvider, err := otelInitLogger(&ctx)
+	loggerProvider, err := otelInitLogger(ctx)
 	if err != nil {
 		return nil, err
 	}

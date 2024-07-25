@@ -3,7 +3,7 @@ package mock
 import (
 	"fmt"
 
-	"github.com/s4mukka/justinject/internal/cli"
+	"github.com/s4mukka/justinject/domain"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +18,6 @@ func (c *MockCli) Execute() error {
 type MockCliFactory struct {
 }
 
-func (c *MockCliFactory) MakeCli() cli.ICli {
+func (c *MockCliFactory) MakeCli() domain.ICli {
 	return &MockCli{}
 }

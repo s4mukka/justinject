@@ -1,23 +1,13 @@
-package server
+package mocks
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/s4mukka/justinject/domain"
 	"github.com/stretchr/testify/mock"
 )
 
-type MockLogger struct {
-	mock.Mock
-	domain.ILogger
-}
-
-func (m *MockLogger) Infof(format string, args ...interface{}) {
-	m.Called(format, args)
-}
-
 type MockRouter struct {
 	mock.Mock
-	IRouter
+	gin.IRoutes
 }
 
 func (m *MockRouter) Run(addr ...string) (err error) {
