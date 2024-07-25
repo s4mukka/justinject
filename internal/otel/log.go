@@ -35,7 +35,7 @@ var (
 )
 
 func InitLogger(ctx domain.IContext) (domain.ILoggerProvider, error) {
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 
 	var otelEndpoint string
 

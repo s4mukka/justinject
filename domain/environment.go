@@ -19,3 +19,5 @@ type Environment struct {
 	LoggerProvider ILoggerProvider
 	TracerProvider ITracerProvider
 }
+
+const EnvironmentKey ContextKey = "environment"

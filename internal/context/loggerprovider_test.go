@@ -20,7 +20,7 @@ func TestInitializeLoggerProviderSuccess(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	mockedLoggerProvider := &mocks.MockedLoggerProvider{}
 	mockedLoggerProvider.On("Logger", "test-instance").Return(&MockedOtelLogger{})
@@ -42,7 +42,7 @@ func TestInitializeLoggerProviderFailure(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	otelInitLogger = func(ctx domain.IContext) (domain.ILoggerProvider, error) {
 		return nil, errors.New("simulated error")

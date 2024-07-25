@@ -55,3 +55,8 @@ test: clean
 
 coverage: test
 	@ go tool cover -html coverage/cover.out
+
+lint:
+	@ printf "Running lint... "
+	@ golangci-lint run
+	@ echo "done"

@@ -12,7 +12,7 @@ var (
 type TracerProviderFactory struct{}
 
 func (l TracerProviderFactory) InitializeTracerProvider(ctx domain.IContext) (domain.ITracerProvider, error) {
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	tracerProvider, err := otelInitTracer(ctx)
 	if err != nil {
 		return nil, err

@@ -17,7 +17,7 @@ func TestInit(t *testing.T) {
 		Instance: "test-instance",
 	}
 
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	logger := Init(ctx)
 
@@ -35,7 +35,7 @@ func TestAddOtelHook(t *testing.T) {
 		Logger:         log.New().WithField("mock", "logger"),
 	}
 
-	ctx := context.WithValue(context.Background(), "environment", mockEnv)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, mockEnv)
 
 	originalNewHook := newOtelLoggrusHook
 	defer func() { newOtelLoggrusHook = originalNewHook }()

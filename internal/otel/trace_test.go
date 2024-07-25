@@ -19,7 +19,7 @@ func TestInitTracer_Success(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	os.Setenv("OTEL_ENDPOINT_GRPC", "localhost:4318")
 	defer os.Unsetenv("OTEL_ENDPOINT_GRPC")
@@ -37,7 +37,7 @@ func TestInitTracer_NoOtelEndpoint(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	os.Unsetenv("OTEL_ENDPOINT_GRPC")
 
@@ -52,7 +52,7 @@ func TestInitTracer_ExporterError(t *testing.T) {
 	environment := &domain.Environment{
 		Instance: "test-instance",
 	}
-	ctx := context.WithValue(context.Background(), "environment", environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, environment)
 
 	os.Setenv("OTEL_ENDPOINT_GRPC", "invalid-endpoint")
 	defer os.Unsetenv("OTEL_ENDPOINT_GRPC")

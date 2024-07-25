@@ -16,7 +16,7 @@ var (
 
 func InitializeContext(instance string) domain.IContext {
 	environment := domain.Environment{Instance: instance}
-	ctx := context.WithValue(context.Background(), "environment", &environment)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, &environment)
 
 	logger := logInit(ctx)
 	environment.Logger = logger
@@ -42,7 +42,7 @@ func ShutdownComponents(ctx domain.IContext) {
 	if ctx == nil {
 		return
 	}
-	environment := ctx.Value("environment").(*domain.Environment)
+	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	logger := environment.Logger
 
 	loggerProvider := environment.LoggerProvider

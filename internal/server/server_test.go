@@ -20,7 +20,7 @@ func TestServer_Init_Success(t *testing.T) {
 		Instance: "test-instance",
 		Logger:   mockLogger,
 	}
-	ctx := context.WithValue(context.Background(), "environment", mockEnv)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, mockEnv)
 
 	server := &Server{Ctx: ctx}
 
@@ -50,7 +50,7 @@ func TestServer_Init_RunError(t *testing.T) {
 		Instance: "test-instance",
 		Logger:   mockLogger,
 	}
-	ctx := context.WithValue(context.Background(), "environment", mockEnv)
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, mockEnv)
 
 	server := &Server{Ctx: ctx}
 
