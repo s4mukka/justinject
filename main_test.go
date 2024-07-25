@@ -20,7 +20,8 @@ func TestMainFunction(t *testing.T) {
 
 	os.Args = []string{"cmd", "broker"}
 
-	main()
+	output := mock.CaptureError(main)
+	assert.Equal(t, "", output)
 }
 
 func TestMainFunctionWithError(t *testing.T) {
