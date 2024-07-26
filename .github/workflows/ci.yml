@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-and-cover:
-    uses: ./.github/workflows/reusables/test-and-cover.yml
+    uses: ./.github/workflows/test-and-cover.reusable.yml
   golangci-lint: 
-    uses: ./.github/workflows/reusables/golangci-lint.yml
+    uses: ./.github/workflows/golangci-lint.reusable.yml
 
