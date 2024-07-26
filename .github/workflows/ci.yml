@@ -1,0 +1,13 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-cover:
+    uses: ./.github/workflows/reusables/test-and-cover.yml
+  golangci-lint: 
+    uses: ./.github/workflows/reusables/golangci-lint.yml
+
