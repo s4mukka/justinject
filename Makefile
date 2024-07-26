@@ -53,6 +53,9 @@ test: clean
 			END {printf("Total coverage: %.2f%% of statements\n", (cov/stat)*100);}'
 	@ echo "done"
 
+citest: test
+	@ go tool cover -func coverage/cover.out -o coverage/cover.out
+
 coverage: test
 	@ go tool cover -html coverage/cover.out
 

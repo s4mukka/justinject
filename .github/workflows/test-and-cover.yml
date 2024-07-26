@@ -23,7 +23,7 @@ jobs:
 
       - name: Run Test
         run: |
-          make test
+          make citest
 
       - name: Go Coverage Badge  # Pass the `coverage.out` output to this action
         uses: tj-actions/coverage-badge-go@v2
