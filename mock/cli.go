@@ -15,8 +15,7 @@ func (c *MockCli) Execute() error {
 	return fmt.Errorf("simulated error")
 }
 
-type MockCliFactory struct {
-}
+type MockCliFactory struct{}
 
 func (c *MockCliFactory) MakeCli() domain.ICli {
 	return &MockCli{}

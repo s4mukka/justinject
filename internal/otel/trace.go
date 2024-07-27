@@ -30,9 +30,7 @@ func (t TracerProvider) Shutdown(ctx context.Context) error {
 	return t.handler.Shutdown(ctx)
 }
 
-var (
-	otlptracegrpcNew = otlptracegrpc.New
-)
+var otlptracegrpcNew = otlptracegrpc.New
 
 func InitTracer(ctx domain.IContext) (domain.ITracerProvider, error) {
 	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)

@@ -5,9 +5,7 @@ import (
 	"github.com/s4mukka/justinject/internal/otel"
 )
 
-var (
-	otelInitLogger = otel.InitLogger
-)
+var otelInitLogger = otel.InitLogger
 
 type LoggerProviderFactory struct{}
 

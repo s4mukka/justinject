@@ -11,14 +11,18 @@ import (
 	traceembedded "go.opentelemetry.io/otel/trace/embedded"
 )
 
-type OtelLoggerProvider = *sdklog.LoggerProvider
-type OtelLoggerOption = log.LoggerOption
-type OtelLogger = log.Logger
-type OtelRecord = log.Record
+type (
+	OtelLoggerProvider = *sdklog.LoggerProvider
+	OtelLoggerOption   = log.LoggerOption
+	OtelLogger         = log.Logger
+	OtelRecord         = log.Record
+)
 
-type OtelTracerProvider = *sdktrace.TracerProvider
-type OtelTracerOption = trace.TracerOption
-type OtelTracer = trace.Tracer
+type (
+	OtelTracerProvider = *sdktrace.TracerProvider
+	OtelTracerOption   = trace.TracerOption
+	OtelTracer         = trace.Tracer
+)
 
 type IOtelLoggerProvider interface {
 	logembedded.LoggerProvider
