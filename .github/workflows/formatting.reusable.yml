@@ -18,7 +18,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-
+  
+      - name: Install Dependencies
+        run: |
+          go install mvdan.cc/gofumpt@latest
+          go install github.com/incu6us/goimports-reviser/v3@latest
+  
       - name: Run Formatting
         run: |
           make format
