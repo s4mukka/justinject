@@ -1,9 +1,10 @@
 package loggrushook
 
 import (
-	"github.com/s4mukka/justinject/domain"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 type OtelLoggrusHook struct {

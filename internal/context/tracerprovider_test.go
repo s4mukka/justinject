@@ -5,9 +5,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/context/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestInitializeTracerProviderSuccess(t *testing.T) {

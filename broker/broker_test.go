@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/s4mukka/justinject/broker/mocks"
-	"github.com/s4mukka/justinject/domain"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/s4mukka/justinject/broker/mocks"
+	"github.com/s4mukka/justinject/domain"
 )
 
 func TestInit(t *testing.T) {

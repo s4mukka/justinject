@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/s4mukka/justinject/domain"
 	"github.com/spf13/cobra"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 type Cli struct {

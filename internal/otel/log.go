@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/s4mukka/justinject/domain"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log"
 	"go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 type LoggerProvider struct {

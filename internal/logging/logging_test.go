@@ -4,12 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/logging/mocks"
-	mocksHook "github.com/s4mukka/justinject/internal/loggrushook/mocks"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
+
+	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/logging/mocks"
+	mocksHook "github.com/s4mukka/justinject/internal/loggrushook/mocks"
 )
 
 func TestInit(t *testing.T) {

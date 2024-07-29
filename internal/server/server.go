@@ -5,8 +5,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/s4mukka/justinject/domain"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 var router domain.IRouter = gin.New()
