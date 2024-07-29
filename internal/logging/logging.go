@@ -3,11 +3,12 @@ package logging
 import (
 	"os"
 
+	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/bridges/otellogrus"
+
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/loggrushook"
 	"github.com/s4mukka/justinject/internal/otellogger"
-	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
 var newOtelLoggrusHook = loggrushook.NewOtelLoggrusHook

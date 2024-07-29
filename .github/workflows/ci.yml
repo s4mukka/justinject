@@ -8,6 +8,8 @@ on:
 jobs:
   test-and-cover:
     uses: ./.github/workflows/test-and-cover.reusable.yml
+  formatting:
+    uses: ./.github/workflows/formatting.reusable.yml
   golangci-lint: 
     uses: ./.github/workflows/golangci-lint.reusable.yml
-
+    needs: formatting

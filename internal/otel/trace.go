@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/s4mukka/justinject/domain"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 type TracerProvider struct {

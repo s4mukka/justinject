@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/server/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/server/mocks"
 )
 
 func TestServer_Init_Success(t *testing.T) {

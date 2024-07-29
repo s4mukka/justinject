@@ -1,8 +1,9 @@
 package mocks
 
 import (
-	"github.com/s4mukka/justinject/domain"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/s4mukka/justinject/domain"
 )
 
 type MockLogger struct {

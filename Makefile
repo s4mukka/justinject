@@ -63,3 +63,9 @@ lint:
 	@ printf "Running lint... "
 	@ golangci-lint run
 	@ echo "done"
+
+format:
+	@ printf "Running format... "
+	@ gofumpt -l -w .
+	@ goimports-reviser -rm-unused -set-alias -format ./...
+	@ echo "done"

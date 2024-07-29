@@ -5,10 +5,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/context/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/context/mocks"
 )
 
 type MockedOtelLogger struct {

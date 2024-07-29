@@ -3,9 +3,10 @@ package loggrushook
 import (
 	"testing"
 
-	"github.com/s4mukka/justinject/internal/loggrushook/mocks"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/s4mukka/justinject/internal/loggrushook/mocks"
 )
 
 func TestNewDecoratedHook(t *testing.T) {

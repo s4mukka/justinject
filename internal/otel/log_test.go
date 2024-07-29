@@ -6,11 +6,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/s4mukka/justinject/domain"
-	"github.com/s4mukka/justinject/internal/otel/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
+
+	"github.com/s4mukka/justinject/domain"
+	"github.com/s4mukka/justinject/internal/otel/mocks"
 )
 
 func TestInitLogger_Success(t *testing.T) {
