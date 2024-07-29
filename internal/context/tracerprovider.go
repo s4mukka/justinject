@@ -5,9 +5,7 @@ import (
 	"github.com/s4mukka/justinject/internal/otel"
 )
 
-var (
-	otelInitTracer = otel.InitTracer
-)
+var otelInitTracer = otel.InitTracer
 
 type TracerProviderFactory struct{}
 

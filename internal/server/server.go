@@ -9,9 +9,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
-var (
-	router domain.IRouter = gin.New()
-)
+var router domain.IRouter = gin.New()
 
 type Server struct {
 	Ctx domain.IContext

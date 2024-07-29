@@ -17,8 +17,7 @@ func (c *Cli) Execute() error {
 	return c.handler.Execute()
 }
 
-type CliFactory struct {
-}
+type CliFactory struct{}
 
 func (c *CliFactory) MakeCli() domain.ICli {
 	return &Cli{

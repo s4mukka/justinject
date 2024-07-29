@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/s4mukka/justinject/broker"
 	"github.com/s4mukka/justinject/domain"
 	"github.com/s4mukka/justinject/internal/cli"
 	internalCtx "github.com/s4mukka/justinject/internal/context"
-	"github.com/spf13/cobra"
 )
 
 var (

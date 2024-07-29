@@ -30,9 +30,7 @@ func (l LoggerProvider) Shutdown(ctx context.Context) error {
 	return l.handler.Shutdown(ctx)
 }
 
-var (
-	otlploghttpNew = otlploghttp.New
-)
+var otlploghttpNew = otlploghttp.New
 
 func InitLogger(ctx domain.IContext) (domain.ILoggerProvider, error) {
 	environment := ctx.Value(domain.EnvironmentKey).(*domain.Environment)

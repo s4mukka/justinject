@@ -7,7 +7,7 @@ import (
 
 type MockRouter struct {
 	mock.Mock
-	gin.IRoutes
+	gin.IRouter
 }
 
 func (m *MockRouter) Run(addr ...string) (err error) {

@@ -7,8 +7,9 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/s4mukka/justinject/mock"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/s4mukka/justinject/mock"
 )
 
 func TestMainFunction(t *testing.T) {

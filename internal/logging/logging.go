@@ -10,9 +10,7 @@ import (
 	"go.opentelemetry.io/contrib/bridges/otellogrus"
 )
 
-var (
-	newOtelLoggrusHook = loggrushook.NewOtelLoggrusHook
-)
+var newOtelLoggrusHook = loggrushook.NewOtelLoggrusHook
 
 func Init(ctx domain.IContext) domain.ILogger {
 	environment := (ctx).Value(domain.EnvironmentKey).(*domain.Environment)
