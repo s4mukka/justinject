@@ -3,7 +3,7 @@ package domain
 import "github.com/gin-gonic/gin"
 
 type IRouter interface {
-	gin.IRoutes
+	gin.IRouter
 	Use(middleware ...gin.HandlerFunc) gin.IRoutes
 	Run(addr ...string) (err error)
 }
