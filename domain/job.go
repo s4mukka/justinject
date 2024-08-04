@@ -27,3 +27,8 @@ type Job struct {
 type IJobUseCase interface {
 	CreateJob(request CreateJobRequest) (*Job, error)
 }
+
+type IJobRepository interface {
+	GetExtractorById(extractorId string) (*Extractor, error)
+	CreateJob(job *Job) error
+}
