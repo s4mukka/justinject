@@ -1,0 +1,35 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: broker-configmap
+data:
+  job.tmpl: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: {{`{{.JobId}}`}}
+    spec:
+      completions: {{`{{.NumPartitions}}`}}
+      parallelism: {{`{{.NumPartitions}}`}}
+      completionMode: Indexed
+      template:
+        spec:
+          imagePullPolicy: IfNotPresent
+          restartPolicy: Never
+          containers:
+            - name: worker
+              image: ant:latest
+              imagePullPolicy: IfNotPresent
+              command: [
+                "ant", "worker",
+                "--query", "{{`{{.Query}}`}}",
+                "--numPartitions", "{{`{{.NumPartitions}}`}}",
+                "--upperBound", "{{`{{.UpperBound}}`}}",
+                "--lowerBound", "{{`{{.LowerBound}}`}}",
+                "--driver", "{{`{{.Driver}}`}}",
+                "--host", "{{`{{.Host}}`}}",
+                "--port", "{{`{{.Port}}`}}",
+                "--user", "{{`{{.User}}`}}",
+                "--password", "{{`{{.Password}}`}}",
+                "--database", "{{`{{.Db}}`}}"
+              ]

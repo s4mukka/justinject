@@ -3,12 +3,13 @@ package broker
 import "github.com/s4mukka/justinject/domain"
 
 type JobUseCase struct {
-	JobRepository domain.IJobRepository
-	K8sRepository domain.IK8sRepository
+	ExtractorRepository domain.IExtractorRepository
+	JobRepository       domain.IJobRepository
+	K8sRepository       domain.IK8sRepository
 }
 
-func (uc *JobUseCase) CreateJob(request domain.CreateJobRequest) (*domain.Job, error) {
-	extractor, err := uc.JobRepository.GetExtractorById(request.ExtractorId)
+func (uc *JobUseCase) CreateJob(request domain.CreateJobRequest) (domain.IJob, error) {
+	extractor, err := uc.ExtractorRepository.GetById(request.ExtractorId)
 	if err != nil {
 		return nil, err
 	}
@@ -21,9 +22,12 @@ func (uc *JobUseCase) CreateJob(request domain.CreateJobRequest) (*domain.Job, e
 			LowerBound:    request.LowerBound,
 			NumPartitions: request.NumPartitions,
 		},
+		Extractor: domain.Extractor{
+			Driver: extractor.Driver,
+		},
 	}
 
-	if err := uc.JobRepository.CreateJob(&job); err != nil {
+	if err := uc.JobRepository.Create(&job); err != nil {
 		return nil, err
 	}
 
@@ -32,4 +36,31 @@ func (uc *JobUseCase) CreateJob(request domain.CreateJobRequest) (*domain.Job, e
 	}
 
 	return &job, nil
+}
+
+type JobUseCaseFactory struct {
+	extractorRepositoryFactory domain.IFactory[domain.IExtractorRepository]
+	jobRepositoryFactory       domain.IFactory[domain.IJobRepository]
+	k8sRepositoryFactory       domain.IFactory[domain.IK8sRepository]
+}
+
+func (f *JobUseCaseFactory) Create() (domain.IJobUseCase, error) {
+	extractorRepository, err := f.extractorRepositoryFactory.Create()
+	if err != nil {
+		return nil, err
+	}
+	jobRepository, err := f.jobRepositoryFactory.Create()
+	if err != nil {
+		return nil, err
+	}
+	k8sRepository, err := f.k8sRepositoryFactory.Create()
+	if err != nil {
+		return nil, err
+	}
+
+	return &JobUseCase{
+		ExtractorRepository: extractorRepository,
+		JobRepository:       jobRepository,
+		K8sRepository:       k8sRepository,
+	}, nil
 }

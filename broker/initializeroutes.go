@@ -6,14 +6,23 @@ import (
 	"github.com/s4mukka/justinject/domain"
 )
 
-var jobServiceFactory JobServiceFactory = JobServiceFactory{}
+var jobServiceFactory domain.IFactory[domain.IJobService] = JobServiceFactory{
+	jobUseCaseFactory: &JobUseCaseFactory{
+		extractorRepositoryFactory: nil,
+		jobRepositoryFactory:       nil,
+		k8sRepositoryFactory:       &K8sRepositoryFactory{},
+	},
+}
 
-func route(fn func(ctx IRestContext)) gin.HandlerFunc {
+func route(fn func(ctx domain.IRestContext)) gin.HandlerFunc {
 	return func(ctx *gin.Context) { fn(ctx) }
 }
 
-func intializeRoutes(router domain.IRouter) {
-	jobService := jobServiceFactory.MakeJobService(nil)
+func intializeRoutes(router domain.IRouter) error {
+	jobService, err := jobServiceFactory.Create()
+	if err != nil {
+		return err
+	}
 
 	basePath := "/api/v1"
 	v1 := router.Group(basePath)
@@ -21,7 +30,7 @@ func intializeRoutes(router domain.IRouter) {
 		v1.POST("/job", route(jobService.CreateJob))
 	}
 	router.GET("/ping", func(ctx *gin.Context) {
-		logger.WithContext(ctx.Request.Context()).Info("pong")
 		ctx.JSON(200, "pong")
 	})
+	return nil
 }

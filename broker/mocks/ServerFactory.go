@@ -6,7 +6,7 @@ import (
 
 type MockServer struct{}
 
-func (m *MockServer) Init(routes func(domain.IRouter), port int) error {
+func (m *MockServer) Init(routes func(domain.IRouter) error, port int) error {
 	return nil
 }
 

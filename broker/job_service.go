@@ -6,16 +6,11 @@ import (
 	"github.com/s4mukka/justinject/domain"
 )
 
-type IRestContext interface {
-	JSON(code int, obj any)
-	ShouldBindJSON(obj any) error
-}
-
 type JobService struct {
 	jobUseCase domain.IJobUseCase
 }
 
-func (c *JobService) CreateJob(ctx IRestContext) {
+func (c *JobService) CreateJob(ctx domain.IRestContext) {
 	var request domain.CreateJobRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -28,11 +23,18 @@ func (c *JobService) CreateJob(ctx IRestContext) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, *job)
+	ctx.JSON(http.StatusOK, job)
 }
 
-type JobServiceFactory struct{}
+type JobServiceFactory struct {
+	jobUseCaseFactory domain.IFactory[domain.IJobUseCase]
+}
 
-func (f *JobServiceFactory) MakeJobService(jobUseCase domain.IJobUseCase) *JobService {
-	return &JobService{jobUseCase}
+func (f JobServiceFactory) Create() (domain.IJobService, error) {
+	jobUseCase, err := f.jobUseCaseFactory.Create()
+	if err != nil {
+		return nil, err
+	}
+
+	return &JobService{jobUseCase}, nil
 }

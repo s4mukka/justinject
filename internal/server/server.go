@@ -16,7 +16,7 @@ type Server struct {
 	Ctx domain.IContext
 }
 
-func (s *Server) Init(intializeRoutes func(router domain.IRouter), port int) error {
+func (s *Server) Init(intializeRoutes func(router domain.IRouter) error, port int) error {
 	environment := s.Ctx.Value(domain.EnvironmentKey).(*domain.Environment)
 	logger := environment.Logger
 
@@ -24,7 +24,10 @@ func (s *Server) Init(intializeRoutes func(router domain.IRouter), port int) err
 
 	router.Use(otelgin.Middleware(environment.Instance))
 
-	intializeRoutes(router)
+	if err := intializeRoutes(router); err != nil {
+		logger.Errorf("Routes initialization failed: %s", err.Error())
+		return err
+	}
 
 	logger.Infof("Listening and serving HTTP on :%d", port)
 

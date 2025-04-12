@@ -13,3 +13,7 @@ type Extractor struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Driver
 }
+
+type IExtractorRepository interface {
+	GetById(extractorId string) (*Extractor, error)
+}

@@ -25,10 +25,11 @@ func TestServer_Init_Success(t *testing.T) {
 
 	server := &Server{Ctx: ctx}
 
-	intializeRoutes := func(r domain.IRouter) {
+	intializeRoutes := func(r domain.IRouter) error {
 		r.GET("/ping", func(c *gin.Context) {
 			c.JSON(200, "pong")
 		})
+		return nil
 	}
 
 	router = new(mocks.MockRouter)
@@ -55,7 +56,7 @@ func TestServer_Init_RunError(t *testing.T) {
 
 	server := &Server{Ctx: ctx}
 
-	intializeRoutes := func(r domain.IRouter) {}
+	intializeRoutes := func(r domain.IRouter) error { return nil }
 
 	router = new(mocks.MockRouter)
 	router.(*mocks.MockRouter).On("Run", []string{":8080"}).Return(errors.New("server error"))
@@ -64,6 +65,31 @@ func TestServer_Init_RunError(t *testing.T) {
 	err := server.Init(intializeRoutes, 8080)
 	assert.Error(t, err)
 	assert.Equal(t, "server error", err.Error())
+
+	mockLogger.AssertExpectations(t)
+	router.(*mocks.MockRouter).AssertExpectations(t)
+}
+
+func TestServer_Init_InitializeRoutesError(t *testing.T) {
+	mockLogger := new(mocks.MockLogger)
+	mockLogger.On("Errorf", "Routes initialization failed: %s", []interface{}{"initialize routes error"})
+
+	mockEnv := &domain.Environment{
+		Instance: "test-instance",
+		Logger:   mockLogger,
+	}
+	ctx := context.WithValue(context.Background(), domain.EnvironmentKey, mockEnv)
+
+	server := &Server{Ctx: ctx}
+
+	intializeRoutes := func(r domain.IRouter) error { return errors.New("initialize routes error") }
+
+	router = new(mocks.MockRouter)
+	router.(*mocks.MockRouter).On("Use", mock.Anything).Return(router)
+
+	err := server.Init(intializeRoutes, 8080)
+	assert.Error(t, err)
+	assert.Equal(t, "initialize routes error", err.Error())
 
 	mockLogger.AssertExpectations(t)
 	router.(*mocks.MockRouter).AssertExpectations(t)

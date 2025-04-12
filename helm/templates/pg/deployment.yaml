@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pg-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg
+  template:
+    metadata:
+      labels:
+        app: pg
+    spec:
+      containers:
+        - name: pg
+          image: pg:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+            - containerPort: 8080

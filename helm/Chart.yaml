@@ -1,0 +1,13 @@
+apiVersion: v2
+name: justinject
+version: "0.0.1"
+appVersion: "0.0.1"
+description: Justinject Installation
+keywords: [justinject]
+home: https://github.com/s4mukka/justinject/README.md
+sources: [https://github.com/s4mukka/justinject]
+icon: https://github.com/s4mukka/justinject/helm/icon.png
+maintainers:
+  - name: Samuel Pereira
+    email: samuelpereirahf@gmail.com
+    url: https://github.com/s4mukka/

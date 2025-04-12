@@ -14,3 +14,7 @@ type MockLogger struct {
 func (m *MockLogger) Infof(format string, args ...interface{}) {
 	m.Called(format, args)
 }
+
+func (m *MockLogger) Errorf(format string, args ...interface{}) {
+	m.Called(format, args)
+}

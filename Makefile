@@ -16,6 +16,10 @@ build-alpine: clean
 		-o build/${PROJECT_NAME}
 	@ echo "done"
 
+helm-build:
+	@ helm package helm -d helm-releases
+	@ helm repo index helm-releases
+
 clean: ## Builds binary
 	@ printf "Cleaning application... "
 	@ rm -rf ${PROJECT_NAME} coverage
@@ -41,10 +45,17 @@ down:
 	@ docker compose down
 	@ echo "done"
 
+minikube:
+	@ if helm ls -n ${PROJECT_NAME} | grep ${PROJECT_NAME}; then \
+		echo "Helm release ${PROJECT_NAME} already installed. Uninstalling..."; \
+		helm uninstall ${PROJECT_NAME} -n ${PROJECT_NAME}; \
+	fi
+	@ helm install ${PROJECT_NAME} helm -n ${PROJECT_NAME}
+
 test: clean
 	@ printf "Running tests... "
 	@ mkdir -p coverage
-	@ go test ./... -coverprofile=coverage/cover.out.tmp | grep -Ev "${EXCLUDES_COVERAGE}"
+	@ go test ./... -coverprofile=coverage/cover.out.tmp -v | grep -Ev "${EXCLUDES_COVERAGE}"
 	@ cat coverage/cover.out.tmp | grep -Ev "${EXCLUDES_COVERAGE}" > coverage/cover.out
 	@ rm -f coverage/cover.out.tmp
 	@	cat coverage/cover.out | \

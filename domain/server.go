@@ -9,7 +9,7 @@ type IRouter interface {
 }
 
 type IServer interface {
-	Init(intializeRoutes func(router IRouter), port int) error
+	Init(intializeRoutes func(router IRouter) error, port int) error
 }
 
 type IServerFactory interface {
